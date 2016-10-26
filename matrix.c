@@ -27,6 +27,13 @@ user	0m21.144s
 sys	0m1.172s */
 
 
+/*
+ * Последний запуск непонятно, как интерпретировать.
+ * В остальных, если предположить, что число ядер - 2, то всё нормально.
+ * 
+ * Вы умеете писать код в одном стиле. Если GNUшный вам больше нравится, то пишите так.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
@@ -37,6 +44,10 @@ typedef struct {
   int size; // dimension of matrix
   int *a, *b, *c; // a, b - original matrix, c - result matrix
 } matrix_multiply_t;
+
+/*
+ * Очень странный комментарий ниже ... Если число нитей, например, 1, то он явно неверный.
+ */
 
 /* Разделение: каждый тред "берет на себя" строку матрицу, соответствующую номеру треда, и последующие строки, соответсвующие номер треда + общее количество тредов */
 typedef struct {
@@ -157,6 +168,7 @@ int main(int argc, char** argv) {
   printf("Data generation done!\n");
 
   pthread_t *tid = (pthread_t*) malloc(sizeof(pthread_t) * numofthread);
+  
   if(tid == NULL) {
     perror("Can't allocate memory for thread structures");
     exit(EXIT_FAILURE);
@@ -169,7 +181,7 @@ int main(int argc, char** argv) {
       exit(EXIT_FAILURE);
     }
     
-    matrix_multiply_t* localmultiply = malloc(sizeof(matrix_multiply_t));
+    matrix_multiply_t* localmultiply = (matrix_multiply_t*)malloc(sizeof(matrix_multiply_t));
 
     localmultiply->a = generate_empty_matrix(size); 
     memcpy(localmultiply->a, multiply.a, sizeof(int) * size * size);
@@ -193,6 +205,11 @@ int main(int argc, char** argv) {
   for(int i = 0; i < numofthread; ++i) {
     pthread_join(tid[i], NULL);
   }
+  
+  /*
+   * Нужно самим чистить память, которую вы выделили в куче. В данном случае оно не принципиально, но
+   * это довольно хорошая привычка.
+   */
 
 // print_matrix(multiply.a, size);
 // print_matrix(multiply.b, size); 
