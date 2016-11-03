@@ -1,0 +1,6 @@
+glass : 2
+plate : 2
+spoon : 3
+cup : 1
+saucepan : 3
+pan : 4
