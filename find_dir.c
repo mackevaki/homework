@@ -55,6 +55,18 @@ int main(int argc, char** argv) {
   }
 
   int deep1 = atoi(argv[2]);
+
+/*
+ * #define MAX_FILE_NAME 100
+ * char dir_name[MAX_FILE_NAME];
+ *
+ * Не используйте в коде магических чисел.
+ * И зачем вы объявили переменную как static?
+ * http://stackoverflow.com/questions/572547/what-does-static-mean-in-a-c-program 
+ * 
+ * В вашем случае static лишнее.
+ */
+ 
   static char dir_name[100];
   static char file_name[100];
   
