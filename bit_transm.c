@@ -7,7 +7,6 @@
 
 #define MAX_LEN 100
 
-void send(char *s);
 void send_bit();
 void get_bit(int n);
 
@@ -18,7 +17,7 @@ pid_t pid;
 int main(int argc, char **argv){
   num = 0;
   pid = getpid();
-
+  //SIGUSR1 == 0; SIGUSR2 == 1;
   (void)signal(SIGUSR1, get_bit);
   (void)signal(SIGUSR2, get_bit);
   (void)signal(SIGINT, send_bit);
@@ -33,16 +32,12 @@ int main(int argc, char **argv){
     send_bit();
   } while(1);
     usleep(1);
-    
 return 0;
 }
-void get_bit(int n) {
-  if (n == SIGUSR1)
-    s[num / 8] &= ~(1 << (num % 8));
-  else
-    s[num / 8] |= 1 << (num % 8);
-    num++;
 
+void get_bit(int n) {
+   (n == SIGUSR1) ? (s[num / 8] &= ~(1 << (num % 8))) : (s[num / 8] |= 1 << (num % 8));
+    num++;
     kill(pid, SIGINT);
     if (num == MAX_LEN * 8) {
       printf("%s\n", s);
@@ -55,17 +50,8 @@ void send_bit() {
   char bit = s[num / 8] & (1 << num % 8);
   num++;
   usleep(1);
-  bit ? kill(pid, SIGUSR1) : kill(pid, SIGUSR2);
+  (bit) ? kill(pid, SIGUSR2) : kill(pid, SIGUSR1);
   if (num == MAX_LEN * 8)
     exit(EXIT_SUCCESS);
 return;
 }
-
-void send(char *s){
-  int i, count;
-  for (i = 0; i < MAX_LEN; i++)
-    for (count = 0; count < 8; count++) {
-      send_bit(s[i] & (1 << count));
-  }
-}
-
